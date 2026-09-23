@@ -94,12 +94,23 @@ export default function DataTable({ onRefresh }) {
   const [total, setTotal] = useState(0);
   const [sorting, setSorting] = useState([{ id: 'date', desc: true }]);
   const [globalFilter, setGlobalFilter] = useState('');
+  const [searchInput, setSearchInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [columnVisibility, setColumnVisibility] = useState({});
   const [columnOrder, setColumnOrder] = useState([]);
   const [showColMenu, setShowColMenu] = useState(false);
-  const [columnPinning, setColumnPinning] = useState({ left: ['date', 'businessUnit'] });
+  const [columnPinning, setColumnPinning] = useState({ left: ['recordId', 'date'] });
   const colMenuRef = useRef(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (globalFilter !== searchInput) {
+        setGlobalFilter(searchInput);
+        setPagination(p => ({ ...p, pageIndex: 0 }));
+      }
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchInput, globalFilter]);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -318,16 +329,17 @@ export default function DataTable({ onRefresh }) {
       {/* Toolbar */}
       <div className="table-toolbar">
         <div className="table-toolbar-left">
-          <div className="table-search-wrap">
+          <div className="table-search-wrap" style={{ position: 'relative' }}>
             <svg className="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             <input
               id="table-search"
               type="text"
               className="table-search"
               placeholder="Search records..."
-              value={globalFilter}
-              onChange={e => { setGlobalFilter(e.target.value); setPagination(p => ({ ...p, pageIndex: 0 })); }}
+              value={searchInput}
+              onChange={e => setSearchInput(e.target.value)}
             />
+            {loading && <div className="loading-spinner" style={{ position: 'absolute', right: 10, width: 12, height: 12, borderWidth: 2 }} />}
           </div>
           <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{total} records</span>
         </div>
@@ -344,7 +356,7 @@ export default function DataTable({ onRefresh }) {
               Columns
             </button>
             {showColMenu && (
-              <div className="dropdown-menu column-toggle-menu" style={{ right: 0, top: '110%', minWidth: 200 }}>
+              <div className="dropdown-menu column-toggle-menu" style={{ right: 0, top: '110%', minWidth: 200, maxHeight: 300, overflowY: 'auto' }}>
                 {table.getAllLeafColumns().filter(c => c.columnDef.enableHiding !== false).map(col => (
                   <div key={col.id} className="column-toggle-item" onClick={col.getToggleVisibilityHandler()}>
                     <div style={{
@@ -365,8 +377,8 @@ export default function DataTable({ onRefresh }) {
       </div>
 
       {/* Table */}
-      <div className="table-scroll-wrap">
-        {loading ? (
+      <div className="table-scroll-wrap" style={{ opacity: (loading && data.length > 0) ? 0.6 : 1, transition: 'opacity 0.2s' }}>
+        {(loading && data.length === 0 && !searchInput) ? (
           <div className="loading-center" style={{ padding: '60px 0' }}>
             <div className="loading-spinner" />
             <span>Loading records...</span>

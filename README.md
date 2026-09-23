@@ -2,6 +2,9 @@
 
 A full-stack MERN application for analyzing organizational spending, monitoring budgets, and managing spend records.
 
+**🟢 Live Demo:** [https://spend-and-saving-analytical-platfor.vercel.app/](https://spend-and-saving-analytical-platfor.vercel.app/)  
+**🔗 Live API:** [https://spend-and-saving-analytical-platform.onrender.com/api/health](https://spend-and-saving-analytical-platform.onrender.com/api/health)
+
 ## 🔑 Test Login Credentials
 
 | Role | Email | Password |
@@ -136,8 +139,9 @@ The Vite proxy is configured to forward `/api/*` calls to `http://localhost:5000
 Date Range · Business Unit · Category · Vendor · Location · Status · Reset
 
 ### Spend Data Table
-- Search, Sort, Pagination
-- Column Resizing, Reordering, Pinning, Show/Hide
+- Search with 400ms debouncing for performance
+- Sort, Pagination
+- Column Resizing, Reordering, Pinning, Show/Hide (with scrollable dropdown)
 - **Inline Editing** for Budget, Actual Spend, Category (double-click)
 - Delete records
 
